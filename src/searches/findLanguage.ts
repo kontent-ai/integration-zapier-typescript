@@ -80,6 +80,7 @@ export const findLanguage = {
   key: 'find_language',
   operation: {
     perform: execute,
+    outputFields,
     inputFields: [
       ...languageSearchFields,
     ],
