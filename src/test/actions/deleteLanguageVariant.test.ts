@@ -190,6 +190,7 @@ const rawItem: ContentItemContracts.IContentItemModelContract = {
   type: { id: rawContentType.id },
   external_id: "item_external_id",
   last_modified: createUTCDate(1355, 4, 5),
+  spaces: [],
 };
 
 const rawVariant: LanguageVariantContracts.ILanguageVariantModelContract = {
@@ -201,5 +202,12 @@ const rawVariant: LanguageVariantContracts.ILanguageVariantModelContract = {
     workflow_identifier: { codename: "default" },
     step_identifier: { id: "6b7590d5-75e5-4860-8cc0-02c5bffce2dc" },
   },
-  workflow_step: { id: "6b7590d5-75e5-4860-8cc0-02c5bffce2dc" },
+  contributors: [],
+  due_date: { value: null },
+  schedule: {
+    publish_display_timezone: null,
+    publish_time: null,
+    unpublish_display_timezone: null,
+    unpublish_time: null,
+  },
 };

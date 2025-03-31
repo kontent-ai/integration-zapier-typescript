@@ -10,10 +10,9 @@ import { Field } from '../fields/field';
 import { findItemByIdentifier } from '../utils/items/get/findItemByIdentifier';
 import { getVariant } from '../utils/items/get/getVariant';
 import { ContentItemModels, LanguageVariantModels } from '@kontent-ai/management-sdk';
-import { getWorkflowSteps } from '../utils/workflows/getWorkflowSteps';
+import { getWorkflow } from '../utils/workflows/getWorkflowSteps';
 import { upsertVariant } from '../utils/items/update/upsertVariant';
 import { getItemResult } from '../utils/items/get/getItemResult';
-import { isPublishedWorkflowStep } from '../utils/workflows/stepCheckers';
 import { createManagementClient } from '../utils/kontentServices/managementClient';
 
 const elementsInfoField: Field = {
@@ -54,10 +53,10 @@ const createNewVersion = async (z: ZObject, bundle: KontentBundle<{}>, itemId: s
     .toPromise();
 
 async function tryUpdate(z: ZObject, bundle: KontentBundle<InputData>, variant: LanguageVariantModels.ContentItemLanguageVariant, item: ContentItemModels.ContentItem) {
-  const workflowSteps = await getWorkflowSteps(z, bundle);
-  const currentStepId = variant.workflowStep.id;
+  const workflow = await getWorkflow(z, bundle);
+  const currentStepId = variant.workflow.stepIdentifier.id;
 
-  if (currentStepId && isPublishedWorkflowStep(currentStepId, workflowSteps)) {
+  if (currentStepId && workflow.publishedStep.id === currentStepId) {
     // Create new version first
     await createNewVersion(z, bundle, item.id, variant.language.id || '');
   }

@@ -83,7 +83,8 @@ describe("createContentItem", () => {
         external_id: itemExternalId,
         last_modified: createUTCDate(1993, 1, 1),
         collection: { id: "00000000-0000-0000-0000-000000000000" },
-      } as ContentItemContracts.IAddContentItemResponseContract);
+        spaces: [],
+      } satisfies ContentItemContracts.IAddContentItemResponseContract);
 
     const expectedCreateVariantRequest = client
       .upsertLanguageVariant()
@@ -104,7 +105,14 @@ describe("createContentItem", () => {
           workflow_identifier: { codename: "default" },
           step_identifier: { id: "3ecd7341-ad09-44b1-b457-4257ba3fa73b" },
         },
-        workflow_step: { id: "3ecd7341-ad09-44b1-b457-4257ba3fa73b" },
+        contributors: [],
+        due_date: { value: null },
+        schedule: {
+          publish_display_timezone: null,
+          publish_time: null,
+          unpublish_display_timezone: null,
+          unpublish_time: null,
+        },
       } satisfies LanguageVariantContracts.IUpsertLanguageVariantResponseContract);
 
     const search = App.creates[createContentItem.key].operation.perform;
@@ -248,6 +256,7 @@ const buildExpectedElements = (builder: LanguageVariantElementsBuilder) => [
   builder.dateTimeElement({
     element: { id: "cb6cd7d6-855c-45b3-ad59-7c25844e85cd" },
     value: "1993-01-01T00:00:00.000Z",
+    display_timezone: null,
   }),
   builder.linkedItemsElement({
     element: { id: "72e5bb70-079c-469a-89f4-b8aba9b75551" },

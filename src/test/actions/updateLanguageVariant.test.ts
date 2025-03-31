@@ -65,8 +65,8 @@ describe("updateLanguageVariant", () => {
       .reply(200, rawContentType)
       .persist();
 
-    const expectedWfRequest = client.listWorkflowSteps();
-    nock(expectedWfRequest.getUrl()).get("").reply(200, rawWfSteps);
+    const expectedWfRequest = client.listWorkflows();
+    nock(expectedWfRequest.getUrl()).get("").reply(200, [rawWf]);
 
     const expectedUpdateRequest = client
       .upsertLanguageVariant()
@@ -123,14 +123,42 @@ describe("updateLanguageVariant", () => {
   });
 });
 
-const rawWfSteps: ReadonlyArray<WorkflowContracts.IWorkflowStepContract> = [
-  {
-    id: "bc6be0f9-1f99-4acf-b2aa-bb856974a633",
-    name: "sample step",
-    codename: "sample_step",
-    transitions_to: [],
+const rawWf: WorkflowContracts.IWorkflowContract = {
+  id: "b4d3b3b4-4b1b-4b1b-8b1b-4b1b4b1b4b1b",
+  name: "Default",
+  codename: "default",
+  scopes: [],
+  steps: [
+    {
+      id: "bc6be0f9-1f99-4acf-b2aa-bb856974a633",
+      name: "sample step",
+      codename: "sample_step",
+      transitions_to: [],
+      color: "gray",
+      role_ids: [],
+    },
+  ],
+  published_step: {
+    id: "b411b28d-7aa0-4462-b923-2e67b8512c94",
+    name: "Published",
+    codename: "published",
+    create_new_version_role_ids: [],
+    unpublish_role_ids: [],
   },
-];
+  scheduled_step: {
+    id: "37267a28-f277-4cf3-ba59-66fe50342259",
+    name: "Scheduled",
+    codename: "scheduled",
+    create_new_version_role_ids: [],
+    unpublish_role_ids: [],
+  },
+  archived_step: {
+    id: "28761a04-4814-45a0-8b6e-7ed1a6384311",
+    name: "Archived",
+    codename: "archived",
+    role_ids: [],
+  },
+};
 
 const rawLanguage: LanguageContracts.ILanguageModelContract = {
   id: "e3a742b4-a946-4baa-bf93-39ad1d13834b",
@@ -163,6 +191,7 @@ const rawItem: ContentItemContracts.IContentItemModelContract = {
   type: { id: rawContentType.id },
   external_id: "item_external_id",
   last_modified: createUTCDate(1355, 4, 5),
+  spaces: [],
 };
 
 const rawVariant: LanguageVariantContracts.ILanguageVariantModelContract = {
@@ -176,8 +205,15 @@ const rawVariant: LanguageVariantContracts.ILanguageVariantModelContract = {
   ],
   last_modified: createUTCDate(1316, 5, 14).toISOString(),
   workflow: {
-    workflow_identifier: { codename: "default" },
-    step_identifier: { id: rawWfSteps[0]?.id || "" },
+    workflow_identifier: { codename: rawWf.codename },
+    step_identifier: { id: rawWf.steps[0]?.id || "" },
   },
-  workflow_step: { id: rawWfSteps[0]?.id || "" },
+  schedule: {
+    publish_display_timezone: null,
+    publish_time: null,
+    unpublish_time: null,
+    unpublish_display_timezone: null,
+  },
+  contributors: [],
+  due_date: { value: null },
 };
