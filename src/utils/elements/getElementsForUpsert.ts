@@ -1,7 +1,7 @@
 import { getContentTypeElements } from '../../fields/elements/getContentTypeElements';
 import { ZObject } from 'zapier-platform-core';
 import { KontentBundle } from '../../types/kontentBundle';
-import { ContentTypeElements, ElementModels } from '@kontent-ai/management-sdk';
+import { ContentTypeElements, ElementModels, LanguageVariantElementsBuilder } from '@kontent-ai/management-sdk';
 import { ElementFields } from '../../fields/elements/getItemElementFields';
 
 type ElementValue = ElementModels.ContentItemElement['value'];
@@ -53,7 +53,7 @@ const getElementValue = (value: RawElementValue, element: ContentTypeElements.Co
   }
 };
 
-type Element = Omit<ElementModels.ContentItemElement, '_raw' | 'components'> & { components?: ElementModels.ContentItemElement['components'] };
+type Element = Omit<ElementModels.ContentItemElement, '_raw' | 'components' | 'display_timezone'> & { components?: ElementModels.ContentItemElement['components'], display_timezone?: null | string };
 
 export const getElementsForUpsert = (z: ZObject, bundle: KontentBundle<ExpectedInputData>, contentTypeId: string): Promise<ReadonlyArray<Element>> =>
   getContentTypeElements(z, bundle, contentTypeId)
@@ -81,6 +81,11 @@ export const getElementsForUpsert = (z: ZObject, bundle: KontentBundle<ExpectedI
             return {
               ...resultElement,
               components: [],
+            };
+          case 'date_time':
+            return {
+              ...resultElement,
+            display_timezone: null,
             };
           default:
             return resultElement;

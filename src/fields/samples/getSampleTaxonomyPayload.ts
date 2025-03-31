@@ -1,7 +1,7 @@
 import { KontentBundle } from '../../types/kontentBundle';
 import { ITaxonomyGroup } from '@kontent-ai/delivery-sdk';
 
-export const getSampleTaxonomyPayload = (bundle: KontentBundle<{}>, sampleGroup: ITaxonomyGroup) => ({
+export const getSampleTaxonomyPayload = (bundle: KontentBundle<{}>, sampleGroup: ITaxonomyGroup<string>) => ({
   data: {
     items: [
       {

@@ -131,7 +131,7 @@ export async function getItemResult(z: ZObject, bundle: KontentBundle<{}>, item:
       externalId: item.externalId || '',
       lastModified: variant.lastModified.toISOString(),
       fullId: fullId,
-      workflowStepId: variant.workflowStep.id || '',
+      workflowStepId: variant.workflow.stepIdentifier.id || '',
       contentTypeId: item.type.id,
       languageId: variant.language.id || '',
     },

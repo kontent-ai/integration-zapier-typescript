@@ -274,6 +274,7 @@ const rawContentItem: ContentItemContracts.IContentItemModelContract = {
   last_modified: createUTCDate(1356, 12, 25),
   collection: { id: "db3ccd21-55db-4ca1-bf85-062538b772c8" },
   external_id: "test_item_external_id",
+  spaces: [],
 };
 
 const rawLanguage: LanguageContracts.ILanguageModelContract = {
@@ -293,7 +294,14 @@ const rawVariant: LanguageVariantContracts.IListLanguageVariantsOfItemResponseCo
     workflow_identifier: { codename: "default" },
     step_identifier: { id: "89205fc8-bf8e-4bc3-9eb2-725c9623ef40" },
   },
-  workflow_step: { id: "89205fc8-bf8e-4bc3-9eb2-725c9623ef40" },
+  contributors: [],
+  due_date: { value: null },
+  schedule: {
+    publish_display_timezone: null,
+    publish_time: null,
+    unpublish_display_timezone: null,
+    unpublish_time: null,
+  },
   elements: [
     {
       element: {
@@ -313,7 +321,7 @@ const rawDeliveryItem: Contracts.IContentItemContract = {
     name: rawContentItem.name,
     language: rawLanguage.codename,
     collection: "default",
-    workflow_step: rawVariant.workflow_step.id || "",
+    workflow_step: rawVariant.workflow.step_identifier.id || "",
     workflow: rawVariant.workflow.workflow_identifier.codename || "",
     last_modified: rawVariant.last_modified,
     sitemap_locations: [],

@@ -1,4 +1,4 @@
-import { getWorkflowSteps } from '../utils/workflows/getWorkflowSteps';
+import { getWorkflow } from '../utils/workflows/getWorkflowSteps';
 import { ZObject } from 'zapier-platform-core';
 import { KontentBundle } from '../types/kontentBundle';
 import { OutputField } from '../fields/output/outputField';
@@ -11,20 +11,18 @@ async function execute(z: ZObject, bundle: KontentBundle<InputData>): Promise<Ou
     return [];
   }
 
-  const workflowSteps = await getWorkflowSteps(z, bundle);
+  const workflowSteps = extractSteps(await getWorkflow(z, bundle));
   const search = stepName.toLowerCase();
 
   const fullMatch = workflowSteps
-    .filter(step => step.name.toLowerCase() === search)
-    .map(prepareWorkflowStepOutput);
+    .filter(step => step.name.toLowerCase() === search);
 
   if (fullMatch.length) {
     return fullMatch;
   }
 
   return workflowSteps
-    .filter(step => step.name.toLowerCase().includes(search))
-    .map(prepareWorkflowStepOutput);
+    .filter(step => step.name.toLowerCase().includes(search));
 }
 
 const outputFields = [
@@ -83,8 +81,9 @@ export type InputData = Readonly<{
   stepName: string;
 }>;
 
-const prepareWorkflowStepOutput = (step: WorkflowModels.WorkflowStep): Output[number] => ({
-  name: step.name,
-  id: step.id,
-  transitionsTo: step.transitionsTo
-});
+const extractSteps = (workflow: WorkflowModels.Workflow): ReadonlyArray<Output[number]> => [
+  ...workflow.steps.map(step => ({ name: step.name, id: step.id, transitionsTo: step.transitions_to.map(t => t.step.id ?? "") })),
+  { name: workflow.scheduledStep.name, id: workflow.scheduledStep.id, transitionsTo: [] },
+  { name: workflow.publishedStep.name, id: workflow.publishedStep.id, transitionsTo: [] },
+  { name: workflow.archivedStep.name, id: workflow.archivedStep.id, transitionsTo: [] },
+];

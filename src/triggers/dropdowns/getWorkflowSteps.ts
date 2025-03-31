@@ -1,12 +1,12 @@
-import { getWorkflowSteps } from '../../utils/workflows/getWorkflowSteps';
+import { getWorkflow } from '../../utils/workflows/getWorkflowSteps';
 import { ZObject } from 'zapier-platform-core';
 import { KontentBundle } from '../../types/kontentBundle';
 import { OutputField } from '../../fields/output/outputField';
 import { OutputFromOutputFields } from '../../fields/output/outputFromOutputFields';
 
 const execute = (z: ZObject, bundle: KontentBundle<{}>): Promise<Output> =>
-  getWorkflowSteps(z, bundle)
-    .then(steps => steps.map(s => ({ id: s.id, name: s.name })));
+  getWorkflow(z, bundle)
+    .then(wf => [...wf.steps, wf.publishedStep, wf.archivedStep].map(s => ({ id: s.id, name: s.name })));
 
 const outputFields = [
   {

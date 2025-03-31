@@ -3,10 +3,9 @@ import { getContentItemField } from '../fields/getContentItemField';
 import { getWorkflowStepField } from '../fields/getWorkflowStepField';
 import { ZObject } from 'zapier-platform-core';
 import { KontentBundle } from '../types/kontentBundle';
-import { getWorkflowSteps } from '../utils/workflows/getWorkflowSteps';
+import { getWorkflow } from '../utils/workflows/getWorkflowSteps';
 import { Field } from '../fields/field';
 import { createManagementClient } from '../utils/kontentServices/managementClient';
-import { isPublishedWorkflowStep, isScheduledWorkflowStep } from '../utils/workflows/stepCheckers';
 import { OutputField } from '../fields/output/outputField';
 import { OutputFromOutputFields } from '../fields/output/outputFromOutputFields';
 
@@ -43,27 +42,30 @@ const execute = async (z: ZObject, bundle: KontentBundle<InputData>): Promise<Ou
 
   const changeWorkflowStep = (itemId: string, languageId: string, workflowStepId: string) =>
     createManagementClient(z, bundle)
-      .changeWorkflowStepOfLanguageVariant()
+      .changeWorkflowOfLanguageVariant()
       .byItemId(itemId)
       .byLanguageId(languageId)
-      .byWorkflowStepId(workflowStepId)
+      .withData({
+        workflow_identifier: { codename: "default" }, // using custom workflows is not supported here yet
+        step_identifier: { id: workflowStepId },
+      })
       .toPromise();
 
   const setWorkflowStep = async (itemId: string, languageId: string, workflowStepId: string) => {
     const variant = await getVariant(z, bundle, itemId, languageId);
-    const workflowSteps = await getWorkflowSteps(z, bundle);
+    const workflow = await getWorkflow(z, bundle);
 
-    const targetIsScheduled = isScheduledWorkflowStep(workflowStepId, workflowSteps);
+    const targetIsScheduled = workflow.scheduledStep.id === workflowStepId;
 
-    const currentStepId = variant.workflowStep.id || '';
+    const currentStepId = variant.workflow.stepIdentifier.id || '';
     if ((currentStepId === workflowStepId) && !targetIsScheduled) {
       // Already in that step (except for scheduled)
       return { message: 'Content item is already in the requested workflow step' };
     }
 
-    const targetIsFirst = workflowSteps[0]?.id === workflowStepId;
+    const targetIsFirst = workflow.steps[0]?.id === workflowStepId;
 
-    if (isPublishedWorkflowStep(currentStepId, workflowSteps)) {
+    if (workflow.publishedStep.id === currentStepId) {
       // Create new version first
       await createNewVersion(itemId, languageId);
       if (targetIsFirst) {
@@ -71,7 +73,7 @@ const execute = async (z: ZObject, bundle: KontentBundle<InputData>): Promise<Ou
         return { message: 'New Draft version has been created' };
       }
     }
-    else if (isScheduledWorkflowStep(currentStepId, workflowSteps)) {
+    else if (workflow.scheduledStep.id === currentStepId) {
       // Cancel scheduling first
       await cancelScheduling(itemId, languageId);
       if (targetIsFirst) {
@@ -80,7 +82,7 @@ const execute = async (z: ZObject, bundle: KontentBundle<InputData>): Promise<Ou
       }
     }
 
-    if (isPublishedWorkflowStep(workflowStepId, workflowSteps)) {
+    if (workflow.publishedStep.id === workflowStepId) {
       await publish(itemId, languageId);
 
       return { message: 'Content item has been published' };
@@ -92,9 +94,7 @@ const execute = async (z: ZObject, bundle: KontentBundle<InputData>): Promise<Ou
       }
 
       // If publish date is soon (within a minute from now) or in the past, we need to publish as scheduling may fail
-
-      //const isInPast = moment(publishDate).add(-1, 'm').isBefore();
-      const isInPast = new Date(publishDate).getTime() < new Date(new Date().toUTCString()).getTime();
+      const isInPast = new Date(publishDate).getTime() < new Date(new Date().toUTCString()).getTime() + 60_000;
       if (isInPast) {
         await publish(itemId, languageId);
 
@@ -134,11 +134,10 @@ const execute = async (z: ZObject, bundle: KontentBundle<InputData>): Promise<Ou
 };
 
 const getScheduledPublishingFields = async (z: ZObject, bundle: KontentBundle<InputData>): Promise<ReadonlyArray<Field>> => {
-  const workflowSteps = await getWorkflowSteps(z, bundle);
+  const workflow = await getWorkflow(z, bundle);
   const stepId = bundle.inputData.workflowStepIds;
 
-  const isScheduledSelected = isScheduledWorkflowStep(stepId, workflowSteps);
-  if (isScheduledSelected) {
+  if (workflow.scheduledStep.id === stepId) {
     // Only display the datetime field for Scheduled workflow step
     return [{
       type: 'datetime',
