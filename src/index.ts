@@ -1,9 +1,5 @@
 import { Authentication } from './authentication';
 import { version } from 'zapier-platform-core';
-import triggerWorkflowStatusChanged from './triggers/triggerWorkflowStatusChanged';
-import triggerTaxonomyChanged from './triggers/triggerTaxonomyChanged';
-import triggerItemPublishChanged from './triggers/triggerItemPublishChanged';
-import triggerItemExistenceChanged from './triggers/triggerItemExistenceChanged';
 import getContentItems from './triggers/dropdowns/getContentItems';
 import getLinkedItems from './triggers/dropdowns/getLinkedItems';
 import getContentTypes from './triggers/dropdowns/getContentTypes';
@@ -17,6 +13,7 @@ import { changeContentItemWorkflow } from './actions/changeContentItemWorkflow';
 import { updateLanguageVariant } from './actions/updateLanguageVariant';
 import { createContentItem } from './actions/createContentItem';
 import { deleteLanguageVariant } from './actions/deleteLanguageVariant';
+import triggerWebhookFired from './triggers/triggerWebhookFired';
 
 // We can roll up all our behaviors in an App.
 export default {
@@ -37,10 +34,7 @@ export default {
 
     // If you want your trigger to show up, you better include it here!
     triggers: {
-        [triggerWorkflowStatusChanged.key]: triggerWorkflowStatusChanged,
-        [triggerTaxonomyChanged.key]: triggerTaxonomyChanged,
-        [triggerItemPublishChanged.key]: triggerItemPublishChanged,
-        [triggerItemExistenceChanged.key]: triggerItemExistenceChanged,
+        [triggerWebhookFired.key]: triggerWebhookFired,
 
         // Lists for dropdowns
         [getLinkedItems.key]: getLinkedItems,

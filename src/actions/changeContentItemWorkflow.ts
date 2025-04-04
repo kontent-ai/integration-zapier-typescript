@@ -3,7 +3,7 @@ import { getContentItemField } from '../fields/getContentItemField';
 import { getWorkflowStepField } from '../fields/getWorkflowStepField';
 import { ZObject } from 'zapier-platform-core';
 import { KontentBundle } from '../types/kontentBundle';
-import { getWorkflow } from '../utils/workflows/getWorkflowSteps';
+import { getWorkflow } from '../utils/workflows/getWorkflow';
 import { Field } from '../fields/field';
 import { createManagementClient } from '../utils/kontentServices/managementClient';
 import { OutputField } from '../fields/output/outputField';
@@ -78,7 +78,7 @@ const execute = async (z: ZObject, bundle: KontentBundle<InputData>): Promise<Ou
       await cancelScheduling(itemId, languageId);
       if (targetIsFirst) {
         // Cancelled scheduling ends up in first WF step
-        return { message: 'Scheduling cancelled and content item has retuned to Draft' };
+        return { message: 'Scheduling cancelled and content item has returned to Draft' };
       }
     }
 

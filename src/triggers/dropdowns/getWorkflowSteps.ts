@@ -1,4 +1,4 @@
-import { getWorkflow } from '../../utils/workflows/getWorkflowSteps';
+import { getWorkflow } from '../../utils/workflows/getWorkflow';
 import { ZObject } from 'zapier-platform-core';
 import { KontentBundle } from '../../types/kontentBundle';
 import { OutputField } from '../../fields/output/outputField';
