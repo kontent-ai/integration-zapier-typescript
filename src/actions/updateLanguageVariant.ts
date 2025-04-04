@@ -10,7 +10,7 @@ import { Field } from '../fields/field';
 import { findItemByIdentifier } from '../utils/items/get/findItemByIdentifier';
 import { getVariant } from '../utils/items/get/getVariant';
 import { ContentItemModels, LanguageVariantModels } from '@kontent-ai/management-sdk';
-import { getWorkflow } from '../utils/workflows/getWorkflowSteps';
+import { getWorkflow } from '../utils/workflows/getWorkflow';
 import { upsertVariant } from '../utils/items/update/upsertVariant';
 import { getItemResult } from '../utils/items/get/getItemResult';
 import { createManagementClient } from '../utils/kontentServices/managementClient';

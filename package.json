@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@kontent-ai/delivery-sdk": "^16.0.0",
-    "@kontent-ai/management-sdk": "^7.7.0",
+    "@kontent-ai/management-sdk": "^7.7.1",
+    "@kontent-ai/webhook-helper": "^3.0.4",
     "zapier-platform-core": "15.11.1"
   },
   "devDependencies": {
