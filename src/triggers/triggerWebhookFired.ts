@@ -6,6 +6,7 @@ import { createManagementClient } from '../utils/kontentServices/managementClien
 import { getWorkflow } from '../utils/workflows/getWorkflow';
 import { getContentTypes } from '../utils/types/getContentTypes';
 import { createWebhook } from '../utils/webhooks/createWebhook';
+import { createDeliveryClient } from '../utils/kontentServices/deliverClient';
 
 async function subscribeHook(z: ZObject, bundle: KontentBundle<InputData>) {
   if (!bundle.targetUrl) {
@@ -193,6 +194,44 @@ const createLanguageFilterField = async (z: ZObject, bundle: KontentBundle<Input
   };
 };
 
+/**
+ * Used to fetch sample data for the trigger testing before publishing. The result is an array of objects, each representing a sample payload of the webhook event.
+ *https://docs.zapier.com/platform/publish/integration-checks-reference#D006
+ */
+const performList = async (z: ZObject, bundle: KontentBundle<InputData>) => {
+  const items = await createDeliveryClient(z, bundle)
+    .items()
+    .queryConfig({
+      usePreviewMode: bundle.inputData.source === 'preview' && !!bundle.authData.previewApiKey,
+    })
+    .toPromise()
+    .then(res => res.data.items);
+
+  return [{
+    notifications: items.map(item => ({
+      data: {
+        system: {
+          id: item.system.id,
+          name: item.system.name,
+          codename: item.system.codename,
+          collection: item.system.collection,
+          workflow: item.system.workflow,
+          workflow_step: item.system.workflowStep,
+          language: item.system.language,
+          type: item.system.type,
+          last_modified: item.system.lastModified,
+        },
+      },
+      message: {
+        environment_id: bundle.authData.projectId,
+        object_type: "content_item",
+        action: item.system.workflowStep === 'published' ? 'published' : 'item_changed',
+        delivery_slot: item.system.workflowStep === 'published' ? 'published' : 'preview',
+      },
+    })),
+  }];
+};
+
 const webhookName = 'Item, Content Type, Taxonomy, Language, or Asset Changed';
 
 export default {
@@ -233,6 +272,7 @@ export default {
     performUnsubscribe: unsubscribeHook,
 
     perform: parsePayload,
+    performList,
     sample: {
       notifications: [
         {
