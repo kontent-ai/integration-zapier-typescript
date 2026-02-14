@@ -24,6 +24,6 @@
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.2",
-    "zapier-platform-cli": "15.11.1"
+    "zapier-platform-cli": "18.1.1"
   }
 }
